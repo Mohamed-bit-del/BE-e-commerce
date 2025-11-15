@@ -6,7 +6,7 @@ const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'] || req.headers['authorization'];
 
   if (!authHeader) {
-    const error = appError.create('err.message', 401, httpStatusText.ERROR);
+    const error = appError.create(err.message, 401, httpStatusText.ERROR);
     return next(error);
   }
 
