@@ -1,9 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const verifyToken = require('../middleware/verifyToken');
 
 const productsController = require('../controllers/products.controller');
 
-router.route('/').get(productsController.getAllProducts).post(productsController.addProduct);
+router
+  .route('/')
+  .get(productsController.getAllProducts)
+  .post(verifyToken, productsController.addProduct);
 
 router
   .route('/:productId')

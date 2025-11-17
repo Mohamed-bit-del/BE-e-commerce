@@ -1,4 +1,5 @@
 const Product = require('../models/product.model');
+const User = require('../models/user.model');
 const asyncWrapper = require('../middleware/asyncWrapper');
 
 const getAllProducts = async (req, res) => {
@@ -15,15 +16,19 @@ const getProduct = asyncWrapper(async (req, res) => {
     return res.status(404).send({ message: 'Product not found' });
   }
   return res.status(200).send(product);
-  // return res.status(500).send({ message: 'Error updating product' }, err);
 });
 
 const addProduct = asyncWrapper(async (req, res) => {
+  const { usetId } = req.body;
+
+  const userExists = User.findById(usetId);
+  if (!userExists) {
+    return res.status(404).send({ message: 'User not found' });
+  }
+
   const newProduct = new Product(req.body);
   const savedProduct = await newProduct.save();
   res.status(201).send(savedProduct);
-
-  // res.status(500).send({ message: 'Error creating product' });
 });
 
 const updateProduct = async (req, res) => {
@@ -31,7 +36,6 @@ const updateProduct = async (req, res) => {
 
   const updatedProduct = await Product.findByIdAndUpdate(productId, req.body, { new: true });
   return res.status(200).send(updatedProduct);
-  // return res.status(500).send({ message: 'Error updating product' }, err);
 };
 
 const deleteProduct = async (req, res) => {
@@ -39,7 +43,6 @@ const deleteProduct = async (req, res) => {
 
   await Product.deleteOne({ _id: productId });
   return res.status(200).json({ data: null });
-  // return res.status(500).send({ message: 'Error deleting product' }, err);
 };
 
 module.exports = {
