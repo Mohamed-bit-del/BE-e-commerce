@@ -1,7 +1,8 @@
 const express = require('express');
 const cors = require('cors');
-const productsRouter = require('./routes/products.routes');
 const userRouter = require('./routes/user.routes');
+const ordersRouter = require('./routes/orders.routes');
+const productsRouter = require('./routes/products.routes');
 const httpStatusText = require('./utils/httpStatusText');
 
 const app = express();
@@ -11,6 +12,7 @@ app.use(express.json());
 
 app.use('/session', userRouter);
 app.use('/store/products', productsRouter);
+app.use('/orders', ordersRouter);
 
 app.use((req, res, next) => {
   res.status(404).json({ status: httpStatusText.ERROR, message: 'NOT FOUND' });

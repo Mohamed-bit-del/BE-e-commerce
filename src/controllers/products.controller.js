@@ -5,7 +5,6 @@ const asyncWrapper = require('../middleware/asyncWrapper');
 const getAllProducts = async (req, res) => {
   const products = await Product.find({}, { __v: false });
   res.status(200).send(products);
-  // res.status(500).send({ message: 'Error retrieving products' });
 };
 
 const getProduct = asyncWrapper(async (req, res) => {
@@ -19,9 +18,9 @@ const getProduct = asyncWrapper(async (req, res) => {
 });
 
 const addProduct = asyncWrapper(async (req, res) => {
-  const { usetId } = req.body;
+  const { userId } = req.body;
 
-  const userExists = User.findById(usetId);
+  const userExists = User.findById(userId);
   if (!userExists) {
     return res.status(404).send({ message: 'User not found' });
   }
