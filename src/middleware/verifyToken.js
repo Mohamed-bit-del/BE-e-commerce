@@ -6,8 +6,7 @@ const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'] || req.headers['authorization'];
 
   if (!authHeader) {
-    const error = appError.create(err.message, 401, httpStatusText.ERROR);
-    return next(error);
+    return next(new appError(err.message, 401, httpStatusText.ERROR));
   }
 
   const token = authHeader.split(' ')[1];
@@ -17,8 +16,7 @@ const verifyToken = (req, res, next) => {
     req.user = curentUser;
     next();
   } catch (err) {
-    const error = appError.create(err.message, 401, httpStatusText.ERROR);
-    return next(error);
+    return next(new appError(err.message, 401, httpStatusText.ERROR));
   }
 };
 

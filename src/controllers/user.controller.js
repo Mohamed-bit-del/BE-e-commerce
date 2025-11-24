@@ -3,9 +3,10 @@ const asyncWrapper = require('../middleware/asyncWrapper');
 const bcrypt = require('bcrypt');
 const generateJWT = require('../utils/generate.jwt');
 const httpStatusText = require('../utils/httpStatusText');
+const AppError = require('../utils/appError');
 
 const getAllUsers = asyncWrapper(async (req, res) => {
-  const users = await User.find({}, { __v: false, "password": false });
+  const users = await User.find({}, { __v: false, password: false });
   res.status(200).json({ status: httpStatusText.SUCCESS, data: { users } });
 });
 
@@ -18,7 +19,7 @@ const register = asyncWrapper(async (req, res, next) => {
     name,
     email,
     password: hashedPassword,
-    role
+    role,
   });
 
   const token = await generateJWT({ id: newUser._id, email: newUser.email, role: newUser.role });
@@ -32,30 +33,30 @@ const login = asyncWrapper(async (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email && !password) {
-    const error = appError.create('Email and Password Are Required', 400, httpStatusText.FAIL);
-    return next(error);
+    return next(new AppError('Email and Password Are Required', 400, httpStatusText.FAIL));
   }
 
   const user = await User.findOne({ email });
 
   if (!user) {
-    const error = appError.create('User Not Found', 400, httpStatusText.FAIL);
-    return next(error);
+    return next(new AppError('User Not Found', 400, httpStatusText.FAIL));
   }
 
   const matchPssword = await bcrypt.compare(password, user.password);
 
   if (user && matchPssword) {
     const token = await generateJWT({ id: user._id, email: user.email, role: user.role });
-    return res.status(200).json({ status: httpStatusText.SUCCESS, data: { name: user.name, role: user.role, email, token } });
+    return res.status(200).json({
+      status: httpStatusText.SUCCESS,
+      data: { user_id: user._id, name: user.name, role: user.role, email, token },
+    });
   } else {
-    const error = appError.create('Something Wrong', 500, httpStatusText.ERROR);
-    return next(error);
+    return next(new AppError('Something Wrong', 500, httpStatusText.ERROR));
   }
-})
+});
 
 module.exports = {
   getAllUsers,
   register,
-  login
+  login,
 };
